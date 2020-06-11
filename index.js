@@ -166,7 +166,7 @@ app.post('/crosswalk/', (req, res) => {
 
 })
 
-app.put('/crosswalk/', (req, res) => {
+app.put('/crosswalk/:id', (req, res) => {
     console.log("PUT crosswalk, body: ");
     console.dir(req.body);
     var body = req.body;
@@ -175,10 +175,12 @@ app.put('/crosswalk/', (req, res) => {
     {
         return res.status(400).send(result.error.details[0].message);
     }
-    const params = [body.state, body.latitude, body.longitude, body.id];
-	con.query("UPDATE crosswalks SET state = ?, latitude = ?, longitude = ? WHERE id = ?", params, (err, results) => {
+    const params = [body.state, body.id];
+	con.query("UPDATE crosswalks SET state = ? WHERE id = ?", params, (err, results) => {
         if(err)
         {
+            console.log("Error updating a crosswalk");
+            console.log(err.message);
             return res.status(400).send(err.message);
         }
 
@@ -211,8 +213,6 @@ function validateUpdateInput(input){
     const schema = {
         id: Joi.number().min(1).max(8).required(),
         state: Joi.string().min(2).max(3).required(),
-        latitude: Joi.number().precision(8).required(),
-        longitude: Joi.number().precision(8).required(),
     };
     return Joi.validate(input, schema);
 }
